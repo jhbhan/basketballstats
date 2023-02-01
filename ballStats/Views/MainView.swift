@@ -18,7 +18,7 @@ struct MainView: View {
                         .foregroundColor(.purple)
                         .shadow(color: .black, radius: 5, x: 0, y: 5)
                 NavigationLink{
-                    LineUp(players: $modelData.playerList, isLineUp: false).onAppear(perform: {modelData.getPlayerList(teamId: teamId)})
+                    LineUp(isLineUp: false).onAppear(perform: {modelData.getPlayerList(teamId: teamId)})
                 } label: {
                     Text("Team Roster")
                         .font(Font.custom(nbafont, size: 24))

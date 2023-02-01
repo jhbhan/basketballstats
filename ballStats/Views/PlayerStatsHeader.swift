@@ -53,9 +53,3 @@ struct PlayerStatsHeader: View {
         .font(.title)
     }
 }
-
-struct PlayerStatsHeader_Previews: PreviewProvider {
-    static var previews: some View {
-        PlayerStatsHeader()
-    }
-}

@@ -45,7 +45,7 @@ struct TableView: View {
                         .border(.white)
                         .buttonBorderShape(.roundedRectangle)
                         .sheet(isPresented: $showingSheet) {
-                            LineUp(players: $modelData.playerList, isLineUp: true)
+                            LineUp(isLineUp: true)
                         }
 
                     Button(action: {

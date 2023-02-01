@@ -115,9 +115,3 @@ struct PlayerStatsRow: View {
         .font(.title)
     }
 }
-
-struct PlayerStatsRow_Previews: PreviewProvider {
-    static var previews: some View {
-        PlayerStatsRow(player: .constant(createDemoPlayer()[0]))
-    }
-}

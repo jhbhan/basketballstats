@@ -61,9 +61,3 @@ struct AddPlayer: View {
                 .edgesIgnoringSafeArea(.all))
     }
 }
-
-struct AddPlayer_Previews: PreviewProvider {
-    static var previews: some View {
-        AddPlayer()
-    }
-}

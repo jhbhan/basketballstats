@@ -8,30 +8,61 @@
 import SwiftUI
 
 struct LineUp: View {
-    @Binding var players: [PlayerStat];
+    @EnvironmentObject var modelData: ModelData;
+    @State var showDeleteConfirmation: Bool = false;
+    @State var showDeleteError: Bool = false;
+    
     @Environment(\.dismiss) var dismiss
     
     let isLineUp: Bool;
     
+    func onClickDelete(_ playerId: Int64){
+        let success = StatsDataStore.shared.deletePlayer(id: playerId)
+        if(success){
+            showDeleteConfirmation = true
+            modelData.getPlayerList(teamId: 1)
+        }
+        else{
+            showDeleteError = true
+        }
+    }
+    
     var body: some View {
         VStack{
-            List($players){ $player in
+            List($modelData.playerList){ $player in
                 Section{
                     HStack{
-                        Button(action: { }) {
+                        Button(action: {
+                                if(isLineUp){
+                                    player.onCourt = !player.onCourt;
+                                }
+                        }) {
                             Label("", systemImage: player.onCourt ? "star.fill" : "star").foregroundColor(.yellow)
                                 .font(Font.custom(nbafont, size: 30))
-                                .opacity(isLineUp ? 1 :0)
-
+                                .opacity(isLineUp ? 1:0)
                         }
+                        Button(action: {
+                            if(!isLineUp){
+                                onClickDelete(player.id)
+                            }
+                        }) {
+                            Label("", systemImage: "trash.fill").foregroundColor(.red)
+                                .font(Font.custom(nbafont, size: 30))
+                                .opacity(isLineUp ? 0:1)
+                        }
+                        .alert("Successfully deleted \(player.name)", isPresented: $showDeleteConfirmation) {
+                            Button("OK", role: .cancel) { }
+                        }
+                        .alert("Error in Deleting", isPresented: $showDeleteError) {
+                            Button("OK", role: .cancel) { }
+                        }
+                        
+                        
                         Text("\(player.name)")
                             .font(Font.custom(nbafont, size: 30))
                             .foregroundColor(.black)
                     }
                     .listRowBackground(Color.white)
-                    .onTapGesture {
-                        player.onCourt = !player.onCourt;
-                    }
                 }
             }
             
