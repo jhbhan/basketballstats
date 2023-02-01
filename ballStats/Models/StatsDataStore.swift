@@ -128,10 +128,6 @@ class StatsDataStore {
         var players: [PlayerStat] = []
         guard let database = db else { return [] }
         do {
-            for player in try database.prepare(self.players.filter(playerTeamId == self.teamId)) {
-                print(player[name])
-            }
-
             for player in try database.prepare(self.players.filter(playerTeamId == self.teamId && self.isDeleted == false)) {
                 players.append(PlayerStat(id: player[playerId], name: player[name]))
             }

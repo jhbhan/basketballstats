@@ -17,7 +17,8 @@ struct AddPlayer: View {
     func onClickSave() {
         let id = StatsDataStore.shared.insertPlayer(name: playerName, teamId: 1)
         if(id != nil){
-            showConfirmation = true;
+            showConfirmation = true
+            playerName = ""
         }
         else{
             showError = true
