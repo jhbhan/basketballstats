@@ -8,7 +8,7 @@
 import Foundation
 
 struct PlayerStat: Identifiable {
-    var id: Int64
+    var id: Int64 //playerId
     var name: String
     var fga: Int64 = 0
     var fgm: Int64 = 0

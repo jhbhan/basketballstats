@@ -42,8 +42,11 @@ struct MainView: View {
                 NavigationLink{
                     TableView()
                         .onAppear(perform: {
-                            _ = StatsDataStore.shared.insertGame(teamId: teamId)
+                            modelData.selectedGameId = StatsDataStore.shared.insertGame(teamId: teamId) ?? 0;
                             modelData.getPlayerList(teamId: teamId)
+                        })
+                        .onDisappear(perform: {
+                            modelData.updatePlayerStats()
                         })
                 } label: {
                     Text("New Game")

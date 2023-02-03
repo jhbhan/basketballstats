@@ -129,7 +129,7 @@ class StatsDataStore {
         guard let database = db else { return [] }
         do {
             for player in try database.prepare(self.players.filter(playerTeamId == self.teamId && self.isDeleted == false)) {
-                players.append(PlayerStat(id: player[playerId], name: player[name]))
+                players.append(PlayerStat(id: player[playerId], name: player[name], onCourt: true))
             }
         } catch {
             print(error)
@@ -165,17 +165,33 @@ class StatsDataStore {
         return games
     }
     
-    func getGameStats(getGameId: Int64, getTeamId: Int64) -> [PlayerStat]{
-        var players: [PlayerStat] = []
+    func getGameStats(getGameId: Int64) -> [PlayerStat]{
+        var playerStatsList: [PlayerStat] = []
         guard let database = db else { return [] }
         do {
-            for player in try database.prepare(self.stats.filter(gameId == getGameId && teamId == getTeamId && self.isDeleted == false)) {
-                players.append(PlayerStat(id: player[playerId], name: player[name], fga: player[fga]))
+            for playerStat in try database.prepare(
+                self.stats.filter(self.stats[gameId] == getGameId && self.stats[isDeleted] == false)
+                    .join(self.players, on: self.stats[playerId] == self.players[playerId])
+            ) {
+                playerStatsList.append(PlayerStat(id: playerStat[players[playerId]],
+                                          name: playerStat[name],
+                                          fga: playerStat[fga],
+                                          fgm: playerStat[fgm],
+                                          tpa: playerStat[tpa],
+                                          tpm: playerStat[tpm],
+                                          rebound: playerStat[rebound],
+                                          assist: playerStat[assist],
+                                          steal: playerStat[steal],
+                                          block: playerStat[block],
+                                          pt: playerStat[pt],
+                                          pf: playerStat[pf],
+                                          onCourt: true
+                                         ))
             }
         } catch {
             print(error)
         }
-        return players
+        return playerStatsList
     }
     
     func insertTeam(name: String) -> Int64? {
@@ -252,54 +268,80 @@ class StatsDataStore {
         }
     }
     
-    func deletePlayer(id: Int64)-> Bool{
-        guard let database = db else { return false }
-
-            let player = players.filter(self.playerId == id)
+    func updateStats(players: [PlayerStat], gameId: Int64) -> Bool {
+        guard let database = db else {return false}
+        
+        for player in players {
+            let playerStat = stats.filter(self.playerId == player.id && self.gameId == gameId)
             do {
-                let update = player.update([
-                    self.isDeleted <- true
+                let update = playerStat.update([
+                    self.fga <- player.fga,
+                    self.fgm <- player.fgm,
+                    self.tpa <- player.tpa,
+                    self.tpm <- player.tpm,
+                    self.rebound <- player.rebound,
+                    self.assist <- player.assist,
+                    self.steal <- player.steal,
+                    self.block <- player.block,
+                    self.pt <- player.pt,
+                    self.pf <- player.pf
                 ])
-                if try database.run(update) > 0 {
-                    return true
-                }
+                try database.run(update)
             } catch {
                 print(error)
             }
-            return false
+        }
+        return false
+    }
+    
+    func deletePlayer(id: Int64)-> Bool{
+        guard let database = db else { return false }
+
+        let player = players.filter(self.playerId == id)
+        do {
+            let update = player.update([
+                self.isDeleted <- true
+            ])
+            if try database.run(update) > 0 {
+                return true
+            }
+        } catch {
+            print(error)
+        }
+        return false
     }
     
     func deleteGame(id: Int64)-> Bool{
         guard let database = db else { return false }
 
-            let game = games.filter(self.gameId == id)
-            do {
-                let update = game.update([
-                    self.isDeleted <- true
-                ])
-                if try database.run(update) > 0 {
-                    return true
-                }
-            } catch {
-                print(error)
+        let game = games.filter(self.gameId == id)
+        do {
+            let update = game.update([
+                self.isDeleted <- true
+            ])
+            if try database.run(update) > 0 {
+                return true
             }
-            return false
+        } catch {
+            print(error)
+        }
+        return false
     }
     
     func deleteTeam(id: Int64)-> Bool{
         guard let database = db else { return false }
 
-            let team = teams.filter(self.teamId == id)
-            do {
-                let update = team.update([
-                    self.isDeleted <- true
-                ])
-                if try database.run(update) > 0 {
-                    return true
-                }
-            } catch {
-                print(error)
+        let team = teams.filter(self.teamId == id)
+        do {
+            let update = team.update([
+                self.isDeleted <- true
+            ])
+            if try database.run(update) > 0 {
+                return true
             }
-            return false
+        } catch {
+            print(error)
+        }
+        return false
     }
 }
