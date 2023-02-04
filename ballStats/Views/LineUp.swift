@@ -13,7 +13,7 @@ struct LineUp: View {
     @State var showDeleteError: Bool = false;
     @State var isPresentingConfirm: Bool = false;
     @State var selectedPlayerId: Int64 = 0;
-    @State var selectedPlayerName: String = 0;
+    @State var selectedPlayerName: String = "";
     
     @Environment(\.dismiss) var dismiss
     
@@ -48,6 +48,7 @@ struct LineUp: View {
                             if(!isLineUp){
                                 self.isPresentingConfirm = true
                                 self.selectedPlayerId = player.id
+                                self.selectedPlayerName = player.name
                             }
                         }) {
                             Label("", systemImage: "trash.fill").foregroundColor(.red)
@@ -57,8 +58,7 @@ struct LineUp: View {
                         .alert("Are you sure?",
                                             isPresented: $isPresentingConfirm) {
                              Button("Delete all items?", role: .destructive) {
-                                 if(!isLineUp && player.id == self.selectedPlayerId){
-                                     self.selectedPlayerName = player.name
+                                 if(!isLineUp){
                                      self.onClickDelete(self.selectedPlayerId)
                                  }
                               }
